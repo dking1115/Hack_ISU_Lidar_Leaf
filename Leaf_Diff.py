@@ -29,8 +29,8 @@ def Leaf_Ident(img,correlated_img,debug=False):
         pc=np.empty((0,6))
         contour_mask=np.zeros_like(mask)
         cv2.drawContours(contour_mask,[contour],-1,255,thickness=cv2.FILLED)
-        for i in range(height-1):
-            for j in range(width-1):
+        for i in range(height):
+            for j in range(width):
                 if contour_mask[i,j]:
                     x,y,z,r,g,b=correlated_img[i,j]
                     row=[x,y,z,r,g,b]
@@ -64,7 +64,8 @@ if __name__=="__main__":
             break
         
         correlated_img=np.random.rand(480,640,6)
-        Leaf_Ident(frame,correlated_img,debug=True)
+        out=Leaf_Ident(frame,correlated_img,debug=True)
+        print(out[0].point_cloud)
     cv2.destroyAllWindows()
 
 
