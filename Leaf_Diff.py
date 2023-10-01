@@ -8,9 +8,9 @@ from leaf_class import leaf
 
 cap = cv2.VideoCapture(0)
 
-lower_color = np.array([100, 100, 100])
-upper_color = np.array([150, 255, 150])
-min_area=1
+lower_color = np.array([0, 10, 10])
+upper_color = np.array([80, 255, 90])
+min_area=15
 
 def Leaf_Ident(img,correlated_img,debug=False):
     """Identifies leafs in the image and outputs an array of leaf objects"""
@@ -19,7 +19,8 @@ def Leaf_Ident(img,correlated_img,debug=False):
     
     leaf_array=[]
     height,width,channels = img.shape
-    
+    i=0
+    contour_mask= None
     # Create a binary mask of pixels within the specified color range
     mask = cv2.inRange(img, lower_color, upper_color)
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -29,12 +30,15 @@ def Leaf_Ident(img,correlated_img,debug=False):
         pc=np.empty((0,6))
         contour_mask=np.zeros_like(mask)
         cv2.drawContours(contour_mask,[contour],-1,255,thickness=cv2.FILLED)
+        #print(f"area {cv2.contourArea(contour)}")
         for i in range(height):
             for j in range(width):
                 if contour_mask[i,j]:
+                    #print(f"i: {i} type {type(i)} j: {j} type {type(j)}")
+                    #print(correlated_img.shape)
                     x,y,z,r,g,b=correlated_img[i,j]
                     row=[x,y,z,r,g,b]
-                    pc=np.vstack((pc,row))
+                    #pc=np.vstack((pc,row))
         leaf_obj=leaf(pc,contour_mask)
         
         leaf_array.append(leaf_obj)
@@ -45,7 +49,8 @@ def Leaf_Ident(img,correlated_img,debug=False):
     if debug:
         cv2.imshow('Contorus',frame_with_contours)
         cv2.imshow('Mask',mask)
-        cv2.imshow("Contour_Mask",contour_mask)
+        if contour_mask is not None:
+            cv2.imshow("Contour_Mask",contour_mask)
         cv2.waitKey(1)
 
     return leaf_array
